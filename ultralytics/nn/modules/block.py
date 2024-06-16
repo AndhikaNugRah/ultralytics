@@ -37,6 +37,7 @@ __all__ = (
     "CBFuse",
     "CBLinear",
     "Silence",
+    "GhostC2f"
 )
 
 
@@ -236,6 +237,16 @@ class C2f(nn.Module):
         y.extend(m(y[-1]) for m in self.m)
         return self.cv2(torch.cat(y, 1))
 
+class GhostC2f(C2f):
+    """Faster and lighter Implementation of CSP GhostC2F with ghost convolutions."""
+
+    def __init__(self, c1, c2, n=1, shortcut=False, g=1, e=0.5):
+        super().__init__()
+        self.c = int(c2 * e)  # hidden channels
+        self.cv1 = GhostConv(c1, 2 * self.c, 1, 1)
+        self.cv2 = GhostConv((2 + n) * self.c, c2, 1)  # optional act=FReLU(c2)
+        self.m = nn.ModuleList(GhostBottleneck(self.c, self.c, shortcut, e=1.0) for _ in range(n))
+
 
 class C3(nn.Module):
     """CSP Bottleneck with 3 convolutions."""
@@ -316,6 +327,7 @@ class GhostBottleneck(nn.Module):
         self.shortcut = (
             nn.Sequential(DWConv(c1, c1, k, s, act=False), Conv(c1, c2, 1, 1, act=False)) if s == 2 else nn.Identity()
         )
+
 
     def forward(self, x):
         """Applies skip connection and concatenation to input tensor."""
