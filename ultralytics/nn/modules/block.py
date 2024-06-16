@@ -241,7 +241,7 @@ class GhostC2f(C2f):
     """Faster and lighter Implementation of CSP GhostC2F with ghost convolutions."""
 
     def __init__(self, c1, c2, n=1, shortcut=False, g=1, e=0.5):
-        super().__init__()
+        super().__init__(c1,c2,n,shortcut,g,e)
         self.cv1 = GhostConv(c1, 2 * self.c, 1, 1)
         self.cv2 = GhostConv((2 + n) * self.c, c2, 1)  # optional act=FReLU(c2)
         self.m = nn.ModuleList(GhostBottleneck(self.c, self.c, shortcut, e=1.0) for _ in range(n))
