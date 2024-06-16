@@ -244,7 +244,7 @@ class GhostC2f(C2f):
         super().__init__(c1,c2,n,shortcut,g,e)
         self.cv1 = GhostConv(c1, 2 * self.c, 1, 1)
         self.cv2 = GhostConv((2 + n) * self.c, c2, 1)  # optional act=FReLU(c2)
-        self.m = nn.ModuleList(GhostBottleneck(self.c, self.c, shortcut, g,e=1.0) for _ in range(n))
+        self.m = nn.ModuleList(GhostBottleneck(self.c, self.c, shortcut, g) for _ in range(n))
 
 
 class C3(nn.Module):
